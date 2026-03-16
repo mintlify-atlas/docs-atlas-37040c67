@@ -1,0 +1,51 @@
+---
+title: "Editing patterns"
+description: "Use the pencil tool to manually repaint cells and undo or redo your changes."
+---
+
+After generating a pattern you can manually adjust individual cells using the built-in pencil tool. Changes are tracked in a full undo/redo history.
+
+## Switching to pencil mode
+
+In the **Vista Previa del Patrón** toolbar, click **✏️ Lápiz**. The button highlights in indigo and the canvas cursor changes to a crosshair. The palette swatches appear to the right of the tool toggle.
+
+## Selecting a paint color
+
+The swatches row shows one button per color in the current palette, plus a transparent swatch on the left. Click any swatch to make it the active paint color. The active swatch is outlined with a white ring.
+
+- **Palette swatches** — each swatch shows the color and its symbol label. Clicking a swatch sets the paint color to that color and symbol.
+- **Transparent swatch** (checkerboard pattern) — selecting this erases cells, replacing them with empty/transparent cells.
+
+<Tip>
+After generating a pattern with many colors, try lowering the **Color similarity threshold** and regenerating to reduce the palette. Then use the pencil to manually fix any cells where the merge produced an incorrect color.
+</Tip>
+
+## Painting cells
+
+With **✏️ Lápiz** active and a color selected:
+
+- **Click** a cell to repaint it with the active color.
+- **Click and drag** to paint multiple cells in one continuous stroke.
+
+All cells touched in a single drag form one stroke. A stroke is committed to the edit history as a single undo entry when you release the mouse button or move the pointer outside the canvas.
+
+## Undo and redo
+
+The four history buttons sit at the right end of the toolbar:
+
+| Button | Action |
+|---|---|
+| **⏮** | Undo all strokes at once |
+| **↩** N | Undo the most recent stroke. The number N shows how many strokes are available to undo. |
+| **↪** N | Redo the most recent undone stroke. The number N shows how many strokes are available to redo. |
+| **⏭** | Redo all undone strokes at once |
+
+The undo and redo buttons are disabled (greyed out) when there is nothing to undo or redo.
+
+## Behavior on re-generation
+
+Clicking **Generar Patrón** again clears the entire edit overlay and resets the undo and redo history. All pencil edits are discarded and the pattern is rebuilt from the original image using the current configuration.
+
+## How edits are stored
+
+Edits are stored as an overlay keyed by cell position (`row_col`). When you export the pattern, the overlay is merged into the color and symbol matrices before the export function runs, so all pencil changes are reflected in the downloaded file.

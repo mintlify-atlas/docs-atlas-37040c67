@@ -1,0 +1,68 @@
+---
+title: "Color filters"
+description: "Use color similarity and opacity thresholds to control your palette size and handle transparency."
+---
+
+The **Filtros de Color** section of the controls panel gives you two sliders that influence how the image processor assigns colors to cells. Adjust them before clicking **Generar Patrón**, then regenerate to see the effect.
+
+## Color similarity threshold
+
+**Umbral de similitud** — range 0–50%, default 0%.
+
+This slider merges colors that are close to each other in RGB space, reducing the number of distinct colors in the palette.
+
+### How it works
+
+After the image is sampled into a grid, each cell gets the average RGB value of the pixels in its region. The app then runs a greedy nearest-representative algorithm over the full palette:
+
+1. It iterates the palette in the order colors first appeared.
+2. For each color it calculates the Euclidean distance to every already-selected representative:
+   `d = sqrt((r₁−r₂)² + (g₁−g₂)² + (b₁−b₂)²)`
+3. If the closest representative is within the threshold distance, the color is merged into that representative.
+4. Otherwise the color becomes a new representative.
+
+The threshold distance is scaled from the slider percentage using:
+
+```
+threshold = (colorThreshold / 100) × MAX_RGB_DIST
+```
+
+Where `MAX_RGB_DIST ≈ 441.67` is the maximum possible distance in RGB space (the distance from black to white: `sqrt(3 × 255²)`).
+
+### Effect on palette size
+
+| Slider value | Behavior |
+|---|---|
+| 0% | Every unique averaged color is kept. Palette can be very large for detailed images. |
+| 5–10% | Merges very similar shades (e.g., near-identical greys). Moderate palette reduction. |
+| 20–30% | Aggressive merging. Broad color families collapse into single representatives. |
+| 50% | Maximum setting. Colors up to half the RGB gamut apart can be merged. Palette will be very small. |
+
+After merging, symbols are reassigned sequentially (A, B, C, … Z, AA, AB, …) to the surviving representatives.
+
+## Alpha/opacity threshold
+
+**Umbral de opacidad** — range 0–100%, default 0%.
+
+This slider controls which pixels are counted when calculating a cell's average color. Any pixel whose alpha channel value is less than or equal to `round(alphaThreshold / 100 × 255)` is ignored.
+
+### When to use it
+
+- **PNG images with anti-aliased edges** — edge pixels are semi-transparent. A low threshold (5–15%) removes these fringe pixels so border cells are not averaged with the background color.
+- **Images with soft shadows or glows** — raise the threshold to treat lightly-opaque pixels as empty.
+- **Fully opaque JPEGs** — leave at 0%; all pixels have alpha 255 and the threshold has no effect.
+
+If all pixels in a cell fall below the threshold, the cell is marked as transparent and rendered as a checkerboard in the preview.
+
+## Combining both filters
+
+The two filters apply independently and can be combined:
+
+1. The alpha threshold runs first, during pixel sampling. It determines which pixels contribute to a cell's average color.
+2. The color threshold runs after sampling, merging similar colors across the completed palette.
+
+A typical workflow for a PNG logo: raise the alpha threshold to 10–20% to clean up anti-aliased edges, then raise the color threshold to 5–15% to reduce the total number of bead colors.
+
+<Warning>
+If your palette contains more than 80 unique colors, a warning appears in the **Paleta de Colores** panel: "Paleta muy grande (N colores). Considera reducir la resolución de la matriz para obtener un patrón más manejable." Increase the color similarity threshold or reduce the grid resolution to bring the palette to a manageable size.
+</Warning>

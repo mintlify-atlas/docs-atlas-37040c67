@@ -1,0 +1,76 @@
+---
+title: "Keyboard shortcuts"
+description: "Mouse interactions and toolbar controls for the pattern preview canvas."
+---
+
+Image to Alpha Pattern is a mouse-driven application. The pattern preview canvas supports scroll-to-zoom, click-and-drag navigation, and a pencil painting tool. There are no custom keyboard shortcuts beyond standard browser behavior.
+
+## Mouse interactions
+
+### Pan mode (default)
+
+| Action | Result |
+|--------|--------|
+| Scroll wheel up | Zoom in toward the cursor position |
+| Scroll wheel down | Zoom out from the cursor position |
+| Left click + drag | Pan the canvas view |
+
+Zoom limits: **0.15×** minimum, **20×** maximum. Each scroll tick applies a factor of **1.12** (in) or **0.893** (out), centered on the cursor position in canvas coordinates.
+
+### Pencil mode
+
+| Action | Result |
+|--------|--------|
+| Left click | Paint the cell under the cursor |
+| Left click + drag | Paint all cells the cursor moves over (one stroke) |
+| Release mouse button | Commit the stroke as a single undo entry |
+| Move cursor off canvas | Commit the current stroke |
+
+<Note>
+  All cells painted in a single continuous drag count as one stroke and are undone together with a single undo action.
+</Note>
+
+## Toolbar controls
+
+### Tool toggle
+
+| Button | Mode |
+|--------|------|
+| **🖐 Mover** | Pan mode — drag to move the view |
+| **✏️ Lápiz** | Pencil mode — click or drag to paint cells |
+
+The palette color swatches are only visible when pencil mode is active.
+
+### Color selection (pencil mode only)
+
+| Control | Action |
+|---------|--------|
+| Checkerboard swatch | Select transparent (eraser) — painted cells become empty |
+| Colored swatch | Select that palette color to paint with |
+
+Each swatch shows the palette symbol inside it. Hovering a swatch shows a tooltip with the hex value and symbol.
+
+### Undo / redo
+
+| Button | Action |
+|--------|--------|
+| **⏮** (Undo all) | Revert all changes since the pattern was generated |
+| **↩ N** (Undo) | Undo the most recent stroke. Shows the number of available undo steps. |
+| **↪ N** (Redo) | Redo the most recently undone stroke. Shows the number of available redo steps. |
+| **⏭** (Redo all) | Reapply all undone changes |
+
+<Info>
+  The undo history is cleared whenever you click **Generate pattern** or load a new image.
+</Info>
+
+### View controls
+
+| Button | Action |
+|--------|--------|
+| **Ajustar vista** (Fit view) | Resets zoom and centers the pattern so it fits the canvas |
+
+The fit-view calculation uses 92% of the canvas size to leave a small margin:
+
+```
+fitZoom = min(900 / (cols × 20), 560 / (rows × 20)) × 0.92
+```

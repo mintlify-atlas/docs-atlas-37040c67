@@ -1,0 +1,130 @@
+---
+title: "Color palette"
+description: "How colors are quantized, merged, and assigned symbols in your alpha pattern."
+---
+
+Understanding how the app converts pixel data into a color palette helps you get the best results from your patterns.
+
+## Color averaging
+
+When you generate a pattern, the app divides your image into a grid of cells. For each cell, it:
+
+1. Maps the cell's position to a region of the original image (using the natural pixel dimensions)
+2. Iterates over every pixel in that region
+3. Averages the R, G, B values of all **non-transparent** pixels (those with `alpha > alphaThreshold`)
+4. Assigns that average color to the cell
+
+If a cell's region contains only transparent pixels (e.g., a PNG with full transparency in that area), the cell is marked as **transparent** and excluded from the palette.
+
+```js
+// Pseudo-code for cell color averaging
+for each cell (row, col):
+  pixels = image pixels in the cell's bounding box
+  opaque = pixels where alpha > minAlpha
+  if opaque.length === 0:
+    cell = { transparent: true }
+  else:
+    cell = { r: avg(opaque.r), g: avg(opaque.g), b: avg(opaque.b) }
+```
+
+## Palette map
+
+After averaging, the app builds a **palette map**: a `Map<hex, { symbol, r, g, b }>` where each unique averaged color hex string maps to its assigned symbol and RGB values.
+
+- Two cells with the same averaged hex share one palette entry and the same symbol.
+- The palette map preserves insertion order (the order colors were first encountered scanning left-to-right, top-to-bottom).
+
+## Symbol assignment
+
+Every unique color receives a sequential letter symbol. The algorithm generates symbols in this order:
+
+| Index | Symbol | Index | Symbol | Index | Symbol |
+|-------|--------|-------|--------|-------|--------|
+| 0 | A | 26 | AA | 52 | BA |
+| 1 | B | 27 | AB | 53 | BB |
+| 2 | C | 28 | AC | 54 | BC |
+| … | … | … | … | … | … |
+| 25 | Z | 51 | AZ | 77 | BZ |
+
+The pattern continues as CA, CB … CZ, DA … and so on, giving effectively unlimited unique symbols for large palettes.
+
+```js
+// Actual indexToSymbol implementation
+const SYMBOL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+function indexToSymbol(index) {
+  let result = '';
+  let n = index;
+  do {
+    result = SYMBOL_CHARS[n % 26] + result;
+    n = Math.floor(n / 26) - 1;
+  } while (n >= 0);
+  return result;
+}
+```
+
+<Info>
+  Symbols are reassigned from scratch after color merging, so the final symbols in your exported pattern always start at A for the first color encountered.
+</Info>
+
+## Color merging
+
+When the **color similarity threshold** is greater than 0, the app merges perceptually similar colors using a **greedy nearest-representative algorithm**:
+
+1. Iterate through all palette entries in insertion order
+2. For each color, find the closest existing representative using Euclidean RGB distance
+3. If the distance is within the threshold, assign this color to that representative
+4. Otherwise, this color becomes a new representative
+
+```js
+// Distance formula between two colors
+distance = sqrt((r1 - r2)² + (g1 - g2)² + (b1 - b2)²)
+```
+
+The threshold is computed from the percentage you set:
+
+```js
+const MAX_RGB_DIST = Math.sqrt(3 * 255 * 255); // ≈ 441.67
+const threshold = (colorThreshold / 100) * MAX_RGB_DIST;
+```
+
+After merging, the palette map is rebuilt with only the representatives, and symbols are reassigned starting from A.
+
+### Effect on palette size
+
+| Threshold | Effect |
+|-----------|--------|
+| 0% | No merging — every unique averaged color gets its own entry |
+| 5% | Merges very similar shades (slight variations from JPEG compression, shadows) |
+| 15% | Merges related tones (e.g., slightly different skin tones) |
+| 30% | Significant merging — useful for simplifying complex photos |
+| 50% | Aggressive merging — large color groups reduced to one representative |
+
+<Tip>
+  Start with a low threshold (5–10%) and increase gradually while watching the palette legend. Aim for a palette size that matches your available bead colors.
+</Tip>
+
+## Text color on cells
+
+In the canvas preview and exported images, each symbol is rendered in either black or white to ensure readability over the cell's background color. The choice is based on the [relative luminance](https://www.w3.org/TR/WCAG21/#dfn-relative-luminance) approximation:
+
+```js
+// Actual getTextColor implementation
+function getTextColor(r, g, b) {
+  const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+  return luma > 128 ? '#000000' : '#ffffff';
+}
+```
+
+Light backgrounds (luma > 128) get black text; dark backgrounds get white text.
+
+## Palette size warning
+
+The palette legend shows a warning when your pattern contains **more than 80 unique colors**:
+
+> ⚠ Paleta muy grande (N colores). Considera reducir la resolución de la matriz para obtener un patrón más manejable.
+
+If you see this warning, consider:
+- Reducing the number of columns and rows
+- Increasing the color similarity threshold
+- Using a simpler source image with fewer distinct colors

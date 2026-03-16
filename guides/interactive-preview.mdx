@@ -1,0 +1,51 @@
+---
+title: "Interactive preview"
+description: "Zoom, pan, and inspect your generated pattern in the canvas preview."
+---
+
+The **Vista Previa del Patrón** canvas appears on the right side of the workspace after you generate a pattern. It renders your grid in real time and updates whenever you make pencil edits.
+
+## Canvas dimensions
+
+The canvas has an internal resolution of **900 × 560 pixels** and scales to fill the available width of its container. The base cell size at zoom level 1 is 20 canvas pixels.
+
+## Automatic fit on generation
+
+Every time a new pattern is generated, the view resets to fit the entire grid within the canvas with a small margin (92% of the maximum fit size). The grid is centered both horizontally and vertically.
+
+You can return to this fitted view at any time by clicking **Ajustar vista** in the top-right corner of the preview panel.
+
+## Zooming
+
+Scroll the mouse wheel over the canvas to zoom:
+
+- **Scroll up** — zoom in by a factor of 1.12 per tick.
+- **Scroll down** — zoom out by a factor of approximately 0.893 per tick.
+
+Zoom is centered on the cursor position, so the cell under your pointer stays fixed as you scroll.
+
+| Limit | Value |
+|---|---|
+| Minimum zoom | 0.15× |
+| Maximum zoom | 20× |
+
+## Panning
+
+Make sure **🖐 Mover** is the active tool (it is the default). Click and drag anywhere on the canvas to pan the view. The cursor changes to a grab hand while dragging.
+
+## Symbol labels
+
+Each cell displays its alphabetic symbol label (A, B, C, … Z, AA, AB, …) when it is large enough to read. Labels are hidden when the rendered cell is smaller than **10 canvas pixels** — this happens at low zoom levels or for large grids. Zoom in to reveal the labels.
+
+## Transparent cells
+
+Cells that are empty (either because they fell below the alpha threshold or were erased with the pencil) are rendered as a **checkerboard pattern** of two dark grey tones. This matches the convention used in image editors to indicate transparency.
+
+## Switching tools
+
+The toolbar below the panel header contains a **🖐 Mover** / **✏️ Lápiz** toggle:
+
+- **🖐 Mover** — drag to pan the canvas. This is the default tool.
+- **✏️ Lápiz** — click or drag to paint cells. When this tool is active, the cursor changes to a crosshair.
+
+The palette color swatches only appear in the toolbar when **✏️ Lápiz** is selected. See [Editing patterns](/guides/editing-patterns) for full details on painting.

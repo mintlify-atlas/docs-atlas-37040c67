@@ -1,0 +1,61 @@
+---
+title: "Uploading an image"
+description: "Learn how to upload JPG, PNG, or WEBP images using drag-and-drop or the file picker."
+---
+
+The app opens on an upload screen. Once you provide an image, the pattern workspace appears automatically.
+
+## Supported formats
+
+The following image formats are accepted:
+
+- **JPG / JPEG** (`.jpg`, `.jpeg`)
+- **PNG** (`.png`)
+- **WEBP** (`.webp`)
+
+<Note>
+PNG and WEBP files can carry per-pixel transparency. The app reads the alpha channel from these files, letting you produce patterns with empty (transparent) cells where the image is see-through. Use the **Alpha/opacity threshold** control to fine-tune which semi-transparent pixels count as empty.
+</Note>
+
+## Uploading with drag-and-drop
+
+<Steps>
+  <Step title="Drag your file over the drop zone">
+    Pick an image file from your file manager and drag it onto the dashed drop zone in the center of the screen. The border turns indigo and the label changes to "Suelta la imagen aquí" to confirm the file is over the target.
+  </Step>
+  <Step title="Release to upload">
+    Drop the file. The app validates the MIME type, then reads the file into memory. A spinning indicator labeled "Procesando imagen…" appears while the file loads.
+  </Step>
+  <Step title="Pattern workspace opens">
+    As soon as the image has loaded, the pattern workspace replaces the upload screen. The columns and rows fields are pre-populated using a default of 50 columns with rows calculated automatically from the image's aspect ratio.
+  </Step>
+</Steps>
+
+## Uploading with the file picker
+
+<Steps>
+  <Step title="Click the drop zone">
+    Click anywhere inside the dashed area (or press **Enter** when it is focused). Your operating system's file picker opens, pre-filtered to show `.jpg`, `.jpeg`, `.png`, and `.webp` files.
+  </Step>
+  <Step title="Select your image">
+    Choose the file and confirm. The app reads the file the same way as drag-and-drop.
+  </Step>
+  <Step title="Pattern workspace opens">
+    The workspace appears once loading completes.
+  </Step>
+</Steps>
+
+## Automatic dimension detection
+
+When you upload a file the app decodes it into an `Image` element and reads the `naturalWidth` and `naturalHeight` values. These pixel dimensions are stored and used to:
+
+- Calculate the initial number of rows from the aspect ratio (with **Mantener proporción original** enabled by default).
+- Display the per-cell pixel size in the matrix configuration panel.
+
+## Error messages
+
+If you drop or select a file whose MIME type is not `image/jpeg`, `image/png`, or `image/webp`, a red error box appears below the drop zone with the message:
+
+> Tipo de archivo no válido: "&lt;type&gt;". Se aceptan JPG, PNG y WEBP.
+
+The drop zone itself is not locked — you can immediately try again with a supported file.

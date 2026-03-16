@@ -1,0 +1,160 @@
+---
+title: "Export formats"
+description: "Technical reference for all six export formats: PNG, Excel, CSV, Google Sheets, and HTML."
+---
+
+Image to Alpha Pattern supports six export formats. Every export reflects any pencil edits you have made — the edit overlay is merged into the pattern data before downloading.
+
+<Note>
+  All exports are generated entirely in your browser. No data is sent to a server.
+</Note>
+
+## Format comparison
+
+| Format | Extension | Best for | Color support |
+|--------|-----------|----------|---------------|
+| PNG | `.png` | Printing, sharing | Full color |
+| Excel | `.xlsx` | Spreadsheet reference | Symbols only (no fill color) |
+| Excel with color | `.xls` | Excel / LibreOffice with color | Cell fill color |
+| CSV | `.csv` | Google Sheets, plain text | Symbols only |
+| Google Sheets | `.xlsx` | Google Sheets with color | Cell fill color (ARGB) |
+| HTML with color | `.html` | Web viewing, color preview | Full color |
+
+## PNG
+
+**Default filename:** `alpha-pattern.png`
+
+Renders the complete pattern onto a hidden high-resolution canvas and downloads it as a PNG image.
+
+<AccordionGroup>
+  <Accordion title="Cell size calculation">
+    The cell size in pixels is chosen automatically so that the longest canvas edge stays within 8000 px, with a minimum of 20 px per cell:
+
+    ```
+    cellByWidth  = floor(8000 / cols)
+    cellByHeight = floor(8000 / rows)
+    CELL = max(20, min(cellByWidth, cellByHeight))
+    ```
+
+    For example, a 50 × 50 grid produces cells of `min(160, 160) = 160 px` each, resulting in an 8000 × 8000 px image.
+  </Accordion>
+  <Accordion title="Rendering details">
+    - **Symbol font:** `bold <size>px monospace` where `size = max(7, floor(CELL * 0.46))`
+    - **Grid outline:** `rgba(0,0,0,0.22)`, line width 0.75 px
+    - **Symbol color:** dark (`#000000`) or light (`#ffffff`) based on cell luminance
+    - **Transparent cells:** checkerboard pattern using `#e0e0e0` and `#c0c0c0`
+  </Accordion>
+</AccordionGroup>
+
+## Excel (.xlsx)
+
+**Default filename:** `alpha-pattern.xlsx`
+
+Creates an Excel workbook with two sheets using [SheetJS](https://sheetjs.com/).
+
+<AccordionGroup>
+  <Accordion title="Sheet 1: Patrón (Pattern)">
+    - Each cell contains the alpha symbol for that position
+    - Column width: `wch: 4` (approximately 4 characters wide)
+    - Row height: `hpt: 20` (20 points ≈ 26.7 px)
+    - Cell styles applied with `cellStyles: true`
+    - Symbol font: bold, 8pt
+    - Cell background fill matches the original averaged color
+    - Transparent cells are left empty
+  </Accordion>
+  <Accordion title="Sheet 2: Paleta (Palette)">
+    A legend table with columns: **Símbolo**, **Color HEX**, **R**, **G**, **B**
+
+    Column widths: Símbolo (10), Color HEX (12), R/G/B (6 each)
+
+    Entries are sorted by symbol length, then alphabetically.
+  </Accordion>
+</AccordionGroup>
+
+## Excel with color (.xls)
+
+**Default filename:** `alpha-pattern-color.xls`
+
+Exports an HTML file with the `.xls` extension. Excel and LibreOffice Calc open it directly and display each cell with its background color.
+
+<Note>
+  This format uses the Microsoft Office XML namespace (`xmlns:x="urn:schemas-microsoft-com:office:excel"`). It is not a native binary `.xls` file — it is an HTML file that Excel recognizes.
+</Note>
+
+<AccordionGroup>
+  <Accordion title="Technical details">
+    - Cell dimensions: `width: 20px; height: 20px`
+    - Font: monospace, 8pt, bold
+    - Transparent cells: empty `<td>` with no fill
+    - Includes a second table for the color palette legend
+  </Accordion>
+</AccordionGroup>
+
+## CSV
+
+**Default filename:** `alpha-pattern.csv`
+
+A plain text comma-separated file with a UTF-8 BOM for compatibility with Excel and Google Sheets auto-detection.
+
+<AccordionGroup>
+  <Accordion title="File structure">
+    The file has two sections separated by blank lines:
+
+    ```
+    A,B,C,A,B,...          ← row 1 of symbol matrix
+    C,A,B,C,A,...          ← row 2
+    ...
+                           ← blank line
+                           ← blank line
+    --- PALETA DE COLORES ---
+    Símbolo,Color HEX,R,G,B
+    A,#ff0000,255,0,0
+    B,#00ff00,0,255,0
+    ...
+    ```
+
+    - Line endings: CRLF (`\r\n`)
+    - Transparent cells appear as empty fields
+    - Fields containing commas, quotes, or newlines are properly quoted
+  </Accordion>
+</AccordionGroup>
+
+## Google Sheets (.xlsx)
+
+**Default filename:** `alpha-pattern-sheets.xlsx`
+
+An `.xlsx` workbook optimized for Google Sheets, using 8-character ARGB color codes (with `FF` opacity prefix) which Google Sheets requires.
+
+<AccordionGroup>
+  <Accordion title="Sheet 1: Patrón (Pattern)">
+    - Same layout as the Excel export (wch:4 columns, hpt:20 rows)
+    - Colors encoded as 8-char ARGB strings: `FF` + 6-char hex (e.g., `FFFF0000` for red)
+    - `cellStyles: true`
+  </Accordion>
+  <Accordion title="Sheet 2: Paleta (Palette)">
+    Columns: **Símbolo**, **Color HEX**, **R**, **G**, **B**, **Muestra** (swatch)
+
+    The HEX column and swatch column (●) are both color-filled for visual reference.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  If you want a color-coded view directly in Google Sheets, use this format. The standard Excel export may not render colors correctly in Google Sheets.
+</Tip>
+
+## HTML with color
+
+**Default filename:** `alpha-pattern-color.html`
+
+A self-contained HTML page you can open in any browser to view the full color pattern.
+
+<AccordionGroup>
+  <Accordion title="Technical details">
+    - Each cell is a `<td>` with inline `background-color` style
+    - Transparent cells use a CSS checkerboard: `repeating-conic-gradient(#e0e0e0 0% 25%, #c0c0c0 0% 50%) 0 0 / 12px 12px`
+    - Symbol font: monospace, 8px, bold
+    - Includes a color palette legend table below the pattern
+    - Dark-themed page (`background: #13131a`)
+    - Language: `lang="es"`
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,104 @@
+---
+title: "FAQ"
+description: "Frequently asked questions about Image to Alpha Pattern."
+---
+
+<AccordionGroup>
+  <Accordion title="What is an alpha bead pattern?">
+    Alpha beads (also called letter beads or alphabet beads) are small plastic beads commonly used in friendship bracelets and jewelry. Each bead has a letter or symbol on it.
+
+    An **alpha pattern** is a grid where each cell represents one bead and shows which color to use. The symbols (A, B, C…) in each cell map to a color listed in the palette legend — so you know which bead color to place at each position in your design.
+
+    Image to Alpha Pattern converts any photo or graphic into exactly this format, automatically assigning symbols to the averaged colors in each grid cell.
+  </Accordion>
+
+  <Accordion title="What image formats are supported?">
+    The app accepts **JPG**, **PNG**, and **WEBP** files.
+
+    PNG and WEBP support transparency — transparent areas in your image become empty (transparent) cells in the pattern, which are excluded from the palette. JPG does not have an alpha channel, so all pixels are treated as opaque.
+
+    The file is validated by MIME type before reading. Other formats (GIF, BMP, SVG, etc.) are not supported.
+  </Accordion>
+
+  <Accordion title="Why does my pattern have too many colors?">
+    By default, the **color similarity threshold** is set to 0%, meaning every distinct averaged color gets its own palette entry. A photograph can produce hundreds of unique colors even at small grid sizes.
+
+    To reduce the palette size:
+    - **Increase the color similarity threshold** (try 5–20%) to merge similar shades
+    - **Reduce the grid size** (fewer columns and rows means each cell averages more pixels, naturally smoothing out variation)
+    - **Use a simpler source image** — illustrations, logos, or graphics with flat colors produce much smaller palettes than photographs
+
+    The palette legend shows a warning when the palette exceeds 80 colors.
+  </Accordion>
+
+  <Accordion title="What does the color similarity threshold do?">
+    The **color similarity threshold** (0–50%) controls how aggressively similar colors are merged into a single palette entry.
+
+    The app computes the Euclidean RGB distance between each palette color and the closest existing "representative" color:
+
+    ```
+    distance = sqrt((r1-r2)² + (g1-g2)² + (b1-b2)²)
+    ```
+
+    The maximum possible distance is `sqrt(3 × 255²) ≈ 441.67` (black vs. white). The threshold percentage converts to a distance:
+
+    ```
+    threshold = (colorThreshold / 100) × 441.67
+    ```
+
+    Colors within that distance are merged into one representative. At 0% no merging occurs; at 50% colors up to ~221 RGB units apart are merged.
+  </Accordion>
+
+  <Accordion title="What does the opacity threshold do?">
+    The **opacity threshold** (0–100%) controls which pixels are counted when averaging a cell's color.
+
+    Any pixel with an alpha channel value below `round(alphaThreshold / 100 × 255)` is ignored. This is useful for:
+
+    - **PNG images with transparency:** Fully transparent areas are already excluded, but semi-transparent edge pixels (from anti-aliasing or soft brushes) can introduce unwanted muted colors at the border of your subject. Raising the threshold to 50–80% discards those fringe pixels.
+    - **Cutout images:** If you've removed the background in an image editor, a non-zero opacity threshold ensures the pattern's edge cells match the solid interior colors rather than blending with the transparent background.
+
+    At the default value of 0%, all pixels with any opacity are included.
+  </Accordion>
+
+  <Accordion title="The app seems slow or unresponsive during generation">
+    Pattern generation runs in a **Web Worker** (a background thread), so the main UI should remain responsive even for large grids.
+
+    If your browser does not support Web Workers or `OffscreenCanvas`, the app automatically falls back to synchronous processing on the main thread. This can make the page appear frozen briefly for large grids (e.g., 300 × 300 cells). Modern versions of Chrome, Firefox, Edge, and Safari all support the required APIs.
+
+    To check: the processing indicator ("Procesando imagen…") should appear smoothly during generation. If the page becomes completely unresponsive, your browser may not support the async code path.
+  </Accordion>
+
+  <Accordion title="Why do the symbol labels disappear when I zoom out?">
+    Symbol labels are hidden when the rendered cell size drops below **10 canvas pixels**. At small zoom levels, cells become too small to display a readable letter.
+
+    Zoom in using the scroll wheel, or click **Ajustar vista** (Fit view) to reset to a zoom level where the entire pattern fits the canvas. Labels will reappear as you zoom in further.
+  </Accordion>
+
+  <Accordion title="Can I edit individual cells after generating a pattern?">
+    Yes. Switch to pencil mode using the **✏️ Lápiz** button in the preview toolbar, then click or drag on cells to repaint them with any color from your palette. Select the checkerboard swatch to erase cells (make them transparent).
+
+    Every stroke is recorded in the undo history. Use **↩** to undo and **↪** to redo individual strokes, or **⏮** / **⏭** to undo or redo everything at once.
+
+    All pencil edits are included when you export — the edit overlay is merged into the pattern data before downloading.
+  </Accordion>
+
+  <Accordion title="Which export format should I use?">
+    It depends on how you plan to use the pattern:
+
+    | Use case | Recommended format |
+    |----------|--------------------|
+    | Printing the pattern | **PNG** — high resolution, scales well |
+    | Manual reference while crafting | **Excel (.xlsx)** — easy to scroll and highlight rows |
+    | Editing the pattern in a spreadsheet | **CSV** (for Google Sheets) or **Excel with color (.xls)** |
+    | Sharing a color preview online | **HTML with color** — open in any browser |
+    | Google Sheets with cell fill colors | **Google Sheets (.xlsx)** |
+
+    The PNG export produces the largest and most readable printed output, with cells sized automatically to fill up to 8000 × 8000 px.
+  </Accordion>
+
+  <Accordion title="Does the app save my work?">
+    No. Image to Alpha Pattern is a fully client-side app — no data is sent to any server and nothing is stored between sessions. When you close or refresh the page, your image, pattern, and edit history are lost.
+
+    **Export your pattern before closing the tab** if you want to keep your work. All six export formats are generated instantly and downloaded to your device.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,57 @@
+---
+title: "Configuring the matrix"
+description: "Set the number of columns, rows, and aspect-ratio behavior for your pattern grid."
+---
+
+The **Configurar Matriz** panel appears on the left of the workspace once you upload an image. Use it to control how many cells the grid contains before you click **Generar Patrón**.
+
+## Columns and rows
+
+| Field | Range | Default |
+|---|---|---|
+| **Columnas (N)** | 1–500 | 50 |
+| **Filas (M)** | 1–500 | Auto-calculated from the image aspect ratio |
+
+Both fields accept whole numbers. Entering a value outside the range clamps it automatically to 1 or 500.
+
+<Tip>
+Start with 20–40 columns for simpler patterns. Fewer cells means the processor averages larger regions of the image, which naturally reduces the number of unique colors in the palette and produces a cleaner, more workable result.
+</Tip>
+
+## Aspect-ratio lock
+
+The **Mantener proporción original** checkbox is enabled by default.
+
+While the lock is active:
+
+- Changing **Columnas (N)** recalculates **Filas (M)** as `round(cols × imageHeight / imageWidth)`.
+- Changing **Filas (M)** recalculates **Columnas (N)** as `round(rows × imageWidth / imageHeight)`.
+
+Disable the checkbox to set columns and rows independently.
+
+## Cell size display
+
+Below the dimension inputs, the panel shows:
+
+```
+Tamaño de celda: W × H px · N celdas en total
+```
+
+Where `W` and `H` are the image's natural width and height divided by the number of columns and rows respectively. This tells you how many original image pixels each bead cell will represent.
+
+## Recommended grid sizes
+
+| Use case | Suggested columns |
+|---|---|
+| Quick preview or test | 10–20 |
+| Standard craft pattern | 30–60 |
+| Detailed artwork | 80–150 |
+| Maximum detail | Up to 500 |
+
+<Warning>
+Grids wider than 100 columns sample small pixel regions per cell. Small regions preserve more color variation, which can result in hundreds of unique colors in the palette. Large palettes are harder to work with when purchasing beads. Use the **Color similarity threshold** filter to consolidate similar shades after generating.
+</Warning>
+
+## Generating the pattern
+
+Click **Generar Patrón** once you have set the dimensions and filters. The button is disabled while processing is in progress. When processing completes, the canvas preview and palette legend update.

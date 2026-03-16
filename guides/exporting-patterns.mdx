@@ -1,0 +1,118 @@
+---
+title: "Exporting patterns"
+description: "Download your alpha pattern in PNG, Excel, CSV, Google Sheets, or HTML format."
+---
+
+The **Exportar Patrón** panel appears below the palette legend. It offers six export formats across three columns. Click any button to generate and download the file immediately.
+
+<Tip>
+All exports include any pencil edits you have made. The edit overlay is merged into the color and symbol matrices before each export function runs.
+</Tip>
+
+<Tabs>
+  <Tab title="PNG">
+    **Button:** 🖼 Exportar PNG — downloads `alpha-pattern.png`
+
+    Renders the full pattern to a hidden high-resolution canvas and saves it as a PNG image.
+
+    **Cell size calculation:**
+
+    The cell size is chosen to be as large as possible while keeping the longest canvas edge within 8000 pixels:
+
+    ```
+    cellSize = max(20, min(floor(8000 / cols), floor(8000 / rows)))
+    ```
+
+    The minimum cell size is 20 pixels, ensuring symbols are always legible.
+
+    **Visual details:**
+
+    - Each cell is filled with its RGB color.
+    - The alpha symbol is drawn in bold monospace font, sized at approximately 46% of the cell size, with color chosen for readability (black on light backgrounds, white on dark).
+    - A faint black grid outline (`rgba(0,0,0,0.22)`, 0.75 px) separates cells.
+    - Transparent/empty cells are rendered as a light grey checkerboard (`#e0e0e0` / `#c0c0c0`).
+  </Tab>
+
+  <Tab title="Excel (.xlsx)">
+    **Button:** 📊 Exportar Excel — downloads `alpha-pattern.xlsx`
+
+    Generates a two-sheet Excel workbook using SheetJS.
+
+    **Sheet 1 — Patrón:**
+
+    - Each cell contains the alpha symbol as a string.
+    - Cells are color-filled using SheetJS `cellStyles`.
+    - Column width: 4 characters (`wch: 4`).
+    - Row height: 20 pt (`hpt: 20`).
+    - Transparent cells are left empty with no fill.
+
+    **Sheet 2 — Paleta:**
+
+    A legend table with five columns:
+
+    | Símbolo | Color HEX | R | G | B |
+    |---|---|---|---|---|
+    | A | #3a2b1c | 58 | 43 | 28 |
+    | … | … | … | … | … |
+
+    Rows are sorted alphabetically by symbol (single-letter symbols first, then two-letter symbols in order).
+  </Tab>
+
+  <Tab title="Excel with color (.xls)">
+    **Button:** 🎨 Excel con color — downloads `alpha-pattern-color.xls`
+
+    Exports an HTML file with an `.xls` extension. Excel and LibreOffice Calc open it and display the inline color styles. This format sidesteps the SheetJS community edition limitation on cell styles in `.xlsx`.
+
+    **Contents:**
+
+    - A pattern table where each cell has an inline `background-color` style, bold monospace symbol text (8 pt), and a 1 px border.
+    - Transparent cells are rendered as empty cells with fixed 20×20 px dimensions.
+    - A palette legend table below the pattern with columns: Símbolo, Color HEX, R, G, B, and a colored swatch column.
+  </Tab>
+
+  <Tab title="CSV">
+    **Button:** 📄 Exportar CSV — downloads `alpha-pattern.csv`
+
+    Exports a UTF-8 CSV file (with BOM for correct auto-detection in Excel and Google Sheets).
+
+    **File structure:**
+
+    1. Rows 1–N: the symbol matrix, one column per cell. Transparent cells appear as empty fields.
+    2. Two blank rows as a separator.
+    3. A section header: `--- PALETA DE COLORES ---`
+    4. A header row: `Símbolo,Color HEX,R,G,B`
+    5. One row per palette color, sorted by symbol.
+
+    Open the file directly in Google Sheets via **File → Import**, or in Excel by double-clicking.
+  </Tab>
+
+  <Tab title="Google Sheets (.xlsx)">
+    **Button:** 🟢 Google Sheets con color — downloads `alpha-pattern-sheets.xlsx`
+
+    An `.xlsx` workbook optimized for Google Sheets. Colors are encoded as 8-character ARGB strings (e.g., `FF3A2B1C`) which is the format Google Sheets expects in OpenXML files.
+
+    **Sheet 1 — Patrón:**
+
+    - Same structure as the standard Excel export (symbols, column width 4, row height 20 pt).
+    - Color fills use ARGB encoding with full opacity (`FF` prefix).
+
+    **Sheet 2 — Paleta:**
+
+    Six columns: Símbolo, Color HEX, R, G, B, and Muestra (swatch). The HEX and Muestra columns are color-filled with the corresponding color. The swatch column displays a `●` character.
+
+    Import into Google Sheets via **File → Import → Upload**.
+  </Tab>
+
+  <Tab title="HTML with color">
+    **Button:** 🎨 HTML con color — downloads `alpha-pattern-color.html`
+
+    A self-contained HTML page. Open it in any browser — no server required.
+
+    **Contents:**
+
+    - A scrollable pattern table where each cell has an inline `background-color` style and a bold monospace symbol label (8 px).
+    - Transparent cells are rendered as a CSS `repeating-conic-gradient` checkerboard.
+    - A dark-themed palette table below the pattern (dark background `#13131a`, blue-tinted header) with columns: Símbolo, HEX, R, G, B, and a colored Muestra swatch.
+    - All styles are embedded in a `<style>` block — the file has no external dependencies.
+  </Tab>
+</Tabs>

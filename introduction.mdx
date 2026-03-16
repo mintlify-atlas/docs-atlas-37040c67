@@ -1,0 +1,85 @@
+---
+title: "Introduction"
+description: "Learn how Image to Alpha Pattern converts images into alpha bead craft patterns."
+---
+
+Image to Alpha Pattern is a free, browser-based tool that converts any photograph or graphic into an **alpha bead pattern matrix** — a grid of colored cells, each labeled with an alphabetic symbol, ready to use for alpha bead crafting, cross-stitch, or pixel art.
+
+No installation is required. Upload an image, configure your grid, and generate a pattern directly in your browser.
+
+<CardGroup cols={3}>
+  <Card title="Alpha bead crafters" icon="beads">
+    Turn a favorite photo into a bead layout you can follow row by row on your peg board.
+  </Card>
+  <Card title="Cross-stitch artists" icon="scissors">
+    Generate a symbol grid from any image — the same letter-coded system used in commercial cross-stitch charts.
+  </Card>
+  <Card title="Pixel art designers" icon="grid">
+    Prototype palettes and grid compositions before committing to a final design.
+  </Card>
+</CardGroup>
+
+## How the conversion works
+
+The tool processes your image in three distinct stages:
+
+<Steps>
+  <Step title="Pixel averaging">
+    The image is drawn to an off-screen canvas at its natural resolution. The canvas is then divided into a grid of *cols* × *rows* cells. For each cell, every pixel that passes the alpha threshold is averaged together to produce a single representative RGB color. Cells where no pixel clears the threshold are marked as transparent.
+  </Step>
+  <Step title="Color quantization">
+    After averaging, the palette may contain hundreds of unique hex values. When you raise the **color similarity threshold**, the tool runs a greedy nearest-representative algorithm over the palette: colors whose RGB Euclidean distance falls within the threshold are merged into a single representative. This reduces the number of distinct bead colors you need to source.
+  </Step>
+  <Step title="Symbol assignment">
+    Each unique color in the final palette is assigned a short alphabetic label in the order it was first encountered: A, B, C … Z, then AA, AB … AZ, BA … The symbol appears inside every cell of that color in the pattern preview and in all exported files.
+  </Step>
+</Steps>
+
+## Key concepts
+
+### Color matrix
+
+The color matrix is a 2-D array of *cols* × *rows* cell objects. Each cell stores its averaged `r`, `g`, `b` channel values, the derived hex string, and a `transparent` flag. This is the primary data structure that drives both the canvas preview and all export formats.
+
+### Palette map
+
+The palette map is a dictionary from hex color string to a palette entry containing the assigned symbol and the `r`, `g`, `b` values of the representative color. It defines the complete set of bead colors required to reproduce the pattern.
+
+### Symbol matrix
+
+The symbol matrix is a 2-D array of the same dimensions as the color matrix. Each element is the alphabetic symbol for that cell's color, or `null` for a transparent cell. Export formats such as Excel and CSV use this matrix to populate the grid with readable labels.
+
+## Browser requirements
+
+<Info>
+  Image to Alpha Pattern runs entirely in the browser — no server receives your images.
+</Info>
+
+The tool is designed for **modern browsers** (Chrome, Edge, Firefox, and Safari current releases). For the best performance, your browser needs support for:
+
+- **Web Workers** — allows pixel-averaging computation to run on a background thread, keeping the page responsive during generation.
+- **OffscreenCanvas** — lets the Web Worker draw and read image pixels without touching the main thread.
+
+If your browser does not support Web Workers or OffscreenCanvas, the tool automatically falls back to synchronous processing on the main thread. The result is identical; you may see a brief pause while a large matrix is computed.
+
+<Note>
+  OffscreenCanvas is not available in all browser configurations. Safari added full support in version 16.4 (March 2023). If you are on an older Safari version, the synchronous fallback will be used automatically.
+</Note>
+
+## Supported image formats
+
+The file upload accepts the following formats:
+
+| Format | Extension | Notes |
+|--------|-----------|-------|
+| JPEG | `.jpg`, `.jpeg` | Fully opaque; alpha threshold has no effect |
+| PNG | `.png` | Supports transparency; use the alpha threshold to control edge handling |
+| WEBP | `.webp` | Supports transparency where encoded |
+
+There is no enforced file-size limit in the upload step, but very large images are down-sampled to the matrix resolution during processing, so the source resolution beyond a few megapixels provides no additional benefit.
+
+## Ready to begin?
+
+<Card title="Quickstart" icon="rocket" href="/quickstart">
+  Upload your first image and generate an alpha bead pattern in under a minute.
+</Card>

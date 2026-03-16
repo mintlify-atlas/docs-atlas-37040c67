@@ -1,80 +1,101 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Upload your first image and generate an alpha bead pattern in under a minute."
 ---
 
-## Get started in three steps
+This guide walks you through generating your first alpha bead pattern from start to finish.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Open the app">
+    Open Image to Alpha Pattern in your browser. You will see the upload screen — a drag-and-drop zone with a file picker button.
+  </Step>
 
-### Step 1: Set up your local environment
+  <Step title="Upload an image">
+    Drag a file onto the upload zone, or click **Choose file** to browse. The app accepts **JPG**, **PNG**, and **WEBP** files.
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    Once the file loads, the app displays a thumbnail of your image and switches to the pattern workspace.
 
-### Step 2: Deploy your changes
+    <Tip>
+      PNG and WEBP files can carry transparency. If your image has transparent edges or a cut-out background, the alpha threshold (step 4) helps you control how those areas are handled.
+    </Tip>
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+  <Step title="Configure the matrix">
+    In the left panel, set the number of **columns** and **rows** for your pattern grid. Each cell in the grid maps to one bead (or one stitch).
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    - The default is **50 columns**, with rows calculated automatically to match your image's aspect ratio.
+    - Both dimensions can go up to **500**.
+    - Enable **aspect ratio lock** (checked by default) so that changing one dimension recalculates the other proportionally.
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    <Tip>
+      Start with a smaller grid — 30–50 columns — to get a clean, low-color-count result. Increase the size only if you need fine detail.
+    </Tip>
 
-### Step 3: Go live
+    The cell size readout below the inputs shows you how many source pixels are averaged into each bead, and the total cell count.
+  </Step>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+  <Step title="Adjust color filters (optional)">
+    Two sliders in the left panel let you simplify the palette before generating:
+
+    - **Color similarity threshold** (0–50 %) — colors whose RGB distance falls within this percentage of the maximum possible distance are merged into a single representative color. Raise this value to reduce the number of distinct bead colors in the pattern.
+    - **Opacity threshold** (0–100 %) — pixels with an alpha channel value below this percentage are treated as transparent and excluded from cell averaging. Useful for removing semi-transparent antialiasing around edges.
+
+    <Note>
+      Both sliders default to 0 %, which means no merging and no transparency filtering. You can leave them untouched for your first pattern and adjust after seeing the result.
+    </Note>
+  </Step>
+
+  <Step title="Generate the pattern">
+    Click **Generate pattern**. The app sends the image and your configuration to a background Web Worker, which draws the image to an off-screen canvas, averages pixels cell by cell, and builds the color matrix, palette map, and symbol matrix.
+
+    A spinner appears on the button while processing is in progress. For a 50 × 50 matrix the process typically completes in under a second.
+
+    <Note>
+      If your browser does not support Web Workers or OffscreenCanvas, processing falls back to the main thread automatically. The output is identical; you may notice a short pause on larger matrices.
+    </Note>
+  </Step>
+
+  <Step title="Review the pattern preview">
+    When generation completes, the canvas on the right shows your pattern. Each colored cell displays its assigned symbol (A, B, C … AA, AB …) when zoomed in far enough to read it.
+
+    Use the preview controls to explore the pattern:
+
+    - **Scroll** to zoom in and out, centered on your cursor.
+    - **Drag** to pan across the grid (pan mode is active by default).
+    - Click **Fit view** to reset the zoom so the entire pattern fits the canvas.
+
+    The palette legend below the canvas lists every color in the pattern alongside its symbol and hex value.
+  </Step>
+
+  <Step title="Export your pattern">
+    Once you are happy with the result, choose a format in the **Export pattern** panel:
+
+    - **PNG** — a high-resolution image of the grid with symbols, ready to print or share.
+    - **Excel (.xlsx)** — a workbook with one cell per bead, populated with symbols, plus a palette sheet. Download **Excel with color** (`.xls`) for a version with cell background colors applied.
+    - **CSV** — a plain-text grid compatible with any spreadsheet application, including Google Sheets. Use **Google Sheets with color** for a `.xlsx` file with cell colors pre-applied for direct import.
+    - **Colored HTML** — a self-contained HTML page where every cell is colored and labeled.
+
+    Click the button for your preferred format; the file downloads immediately.
+
+    <Tip>
+      If you made pencil edits to the pattern, all export formats include your changes — exports always reflect the current state of the canvas.
+    </Tip>
+  </Step>
+</Steps>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Configuring the matrix" icon="table-cells" href="/guides/configuring-the-matrix">
+    Learn how column count, row count, and aspect-ratio lock interact.
+  </Card>
+  <Card title="Color filters" icon="palette" href="/guides/color-filters">
+    Use color similarity and opacity thresholds to clean up your palette.
+  </Card>
+  <Card title="Interactive preview" icon="magnifying-glass" href="/guides/interactive-preview">
+    Zoom, pan, and explore your generated pattern on the canvas.
+  </Card>
+  <Card title="Exporting patterns" icon="download" href="/guides/exporting-patterns">
+    Compare all available export formats and choose the right one for your workflow.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
