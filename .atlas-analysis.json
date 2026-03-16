@@ -1,0 +1,68 @@
+{
+  "projectType": "saas",
+  "projectName": "Image to Alpha Pattern",
+  "projectDescription": "A browser-based tool that converts images (JPG, PNG, WEBP) into alpha bead pattern matrices with color quantization, interactive editing, and multi-format export (PNG, Excel, CSV, HTML).",
+  "theme": "almond",
+  "primaryColor": "#6366f1",
+  "lightColor": "#a5b4fc",
+  "darkColor": "#312e81",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "quickstart"]
+          },
+          {
+            "group": "Using the App",
+            "pages": [
+              "guides/uploading-an-image",
+              "guides/configuring-the-matrix",
+              "guides/color-filters",
+              "guides/interactive-preview",
+              "guides/editing-patterns",
+              "guides/exporting-patterns"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/export-formats",
+              "reference/color-palette",
+              "reference/keyboard-shortcuts",
+              "reference/faq"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Upload images via drag-and-drop or file picker (JPG, PNG, WEBP)",
+    "Configure pattern matrix dimensions (columns × rows, up to 500×500)",
+    "Aspect ratio lock to preserve original image proportions",
+    "Color similarity threshold to merge perceptually similar colors into fewer palette entries",
+    "Alpha/transparency threshold to cleanly handle semi-transparent image edges",
+    "Web Worker-based image processing to keep the UI responsive during pixel averaging",
+    "Interactive zoomable and pannable canvas preview with symbol labels per cell",
+    "Pencil tool for manually painting individual cells with palette colors or transparent",
+    "Full undo/redo history (stroke-level granularity) with undo-all and redo-all",
+    "Export to PNG (high-res), Excel XLSX, colored XLS (HTML), CSV, Google Sheets XLSX, and colored HTML"
+  ],
+  "publicApiSurface": [
+    "processImage(img, cols, rows, options) → { colorMatrix, paletteMap, symbolMatrix }",
+    "processImageAsync(img, cols, rows, options) → Promise<{ colorMatrix, paletteMap, symbolMatrix }>",
+    "toHex(r, g, b) → string",
+    "getTextColor(r, g, b) → string",
+    "indexToSymbol(index) → string",
+    "exportToPNG(patternData, patternConfig, filename?)",
+    "exportToExcel(patternData, patternConfig, filename?)",
+    "exportToExcelColored(patternData, patternConfig, filename?)",
+    "exportToCSV(patternData, patternConfig, filename?)",
+    "exportToCSVColored(patternData, patternConfig, filename?)",
+    "exportToGoogleSheetsColored(patternData, patternConfig, filename?)",
+    "ImageProvider / useImage() React context hook"
+  ]
+}
